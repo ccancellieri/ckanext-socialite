@@ -11,7 +11,7 @@
       <fieldset>
         <legend>
           {% set auth_text = _("Log in with your {site_title} account") %}
-        <h4>{{ auth_text.format(site_title=app_globals.site_title) }}</h4>
+        <h4>{{ auth_text.format(site_title=site_title) }}</h4>
         </legend>
         {% block form %}
           {% snippet "user/snippets/login_form.html", action=c.login_handler, error_summary=error_summary %}

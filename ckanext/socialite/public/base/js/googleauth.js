@@ -39,32 +39,40 @@ var startApp = function () {
 
 
 function attachSignin(element) {
-  auth2.attachClickHandler(element, {},
-      function(googleUser) {
 
-        var profile = googleUser.getBasicProfile();
-        var name = profile.getName();
-        var email = profile.getEmail();
+auth2.currentUser.listen(function (googleUser) {
+//    if (googleUser.isSignedIn()) {
+//        // do your login(googleUser) function
+//    } else {
+        auth2.attachClickHandler(element, {},
+          function(googleUser) {
 
-	var response = googleUser.getAuthResponse();
-	var id_token = response['id_token'];
-	var access_token = response['access_token'];
+            var profile = googleUser.getBasicProfile();
+            var name = profile.getName();
+            var email = profile.getEmail();
 
-	$.ajax({
-      type: 'POST',
-      url: '/user/login',
-      data: {name: name, email: email, id_token: id_token, token: access_token},
-      success: function (res, status, xhr) {
-        window.location.replace('/dataset');
-      },
-      error: function(xhr, status, err) {
-        alert('Login failure: ' + err);
-      }
-    });
+        var response = googleUser.getAuthResponse();
+        var id_token = response['id_token'];
+        var access_token = response['access_token'];
 
-      }, function(error) {
-        console.log(console.error());
-      });
+        $.ajax({
+          type: 'POST',
+          url: '/user/login',
+          data: {name: name, email: email, id_token: id_token, token: access_token},
+          success: function (res, status, xhr) {
+            window.location.replace('/dataset');
+          },
+          error: function(xhr, status, err) {
+            alert('Login failure: ' + err);
+          }
+        });
+
+          }, function(error) {
+            console.log(console.error());
+          });
+//    }
+});
+
 
 }
 
@@ -85,12 +93,13 @@ function getMetaContent (propName) {
 /* Firebase Setup and Integration with CKAN */
 
 var config = {
-  apiKey: 'AIzaSyC0cAtWyUOKioISC2BIiPgws9PBT6lqSl0',
-  authDomain: 'ckan-githubauth.firebaseapp.com',
-  databaseURL: 'https://ckan-githubauth.firebaseio.com',
-  projectId: 'ckan-githubauth',
-  storageBucket: '',
-  messagingSenderId: '467483203377'
+  apiKey: 'AIzaSyDsclAFQQikHekpQJ7g6zFvR8C-XQw6-sA',
+  authDomain: 'fao-maps-review.firebaseapp.com',
+  databaseURL:'https://fao-maps-review.firebaseio.com',
+  projectId: 'fao-maps-review',
+  storageBucket: 'fao-maps-review.appspot.com',
+  messagingSenderId: '1036455980974',
+  appId: "1:1036455980974:web:2ff90c50d68fbf64b7e23f"
 }
 
 firebase.initializeApp(config)

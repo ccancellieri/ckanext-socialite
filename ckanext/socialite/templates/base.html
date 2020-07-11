@@ -11,6 +11,8 @@
 {% set ci=h.googleauth_get_clientid() %}
 {% set hd=h.googleauth_get_hosted_domain() %}
   {{ super() }}
+<div id="g-signin-button" data-width="300" data-height="200" data-longtitle="true">
+
     <meta name="google-signin-scope" content="profile email">
     <meta name="google-signin-client_id" content="{{ ci }}">
     <meta name="google-signin-hosted_domain" content="{{ hd }}">
