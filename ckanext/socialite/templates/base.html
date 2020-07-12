@@ -20,12 +20,31 @@
 {% endblock %}
 
 {% block scripts %}
+<script>
+    var doLogin = function (user) {
+        $.ajax({
+                  type: 'POST',
+                  url: '/firebase/login',
+                  data: JSON.stringify(user),
+                  contentType: 'application/json',
+                  dataType: 'json',
+                  success: function (res, status, xhr) {
+                    //window.location.replace('/dataset');
+                    console.log('user specs sent to ckan')
+                  },
+                  error: function(xhr, status, err) {
+                    console.log('Login failure: ' + err);
+                  }
+                });
+    }
+
+</script>
 
     <!-- The core Firebase JS SDK is always required and must be listed first -->
-    <script defer src="https://www.gstatic.com/firebasejs/7.16.0/firebase-app.js"></script>
+    <script asynch src="https://www.gstatic.com/firebasejs/7.16.0/firebase-app.js"></script>
 
     <!-- https://firebase.google.com/docs/web/setup#available-libraries -->
-    <script defer src="https://www.gstatic.com/firebasejs/7.16.0/firebase-auth.js"></script>
+    <script asynch src="https://www.gstatic.com/firebasejs/7.16.0/firebase-auth.js"></script>
 
 <script>
   var firebaseConfig = {
@@ -51,7 +70,17 @@
         var isAnonymous = user.isAnonymous;
         var uid = user.uid;
         var providerData = user.providerData;
-        // ...
+
+        doLogin({
+            'displayName':displayName,
+            'email':email,
+            'emailVerified':emailVerified,
+            'photoURL':photoURL,
+            'isAnonymous':isAnonymous,
+            'uid':uid,
+            'providerData':providerData
+        });
+
       } else {
         console.log('User is signed OUT');
 
