@@ -39,6 +39,34 @@ var startApp = function () {
 
 
 function attachSignin(element) {
+    if (googleUser.isSignedIn && googleUser.isSignedIn()) {
+        // do your login(googleUser) function
+ 	login(); 
+  } else {
+
+  auth2.attachClickHandler(element, {},
+      function(googleUser) {
+
+        var profile = googleUser.getBasicProfile();
+        var name = profile.getName();
+        var email = profile.getEmail();
+
+	var response = googleUser.getAuthResponse();
+	var id_token = response['id_token'];
+	var access_token = response['access_token'];
+
+	$.ajax({
+      type: 'POST',
+      url: '/ckan'+'/user/login',
+      data: {name: name, email: email, id_token: id_token, token: access_token},
+      success: function (res, status, xhr) {
+        window.location.replace('/ckan'+'/dataset');
+      },
+      error: function(xhr, status, err) {
+        alert('Login failure: ' + err);
+      }
+    });
+  });
 
     auth2.currentUser.listen(
         function (googleUser) {
@@ -125,10 +153,10 @@ function login () {
           var signedinusername = profile.email.split('@')[0].replace(/\./g, '')
           $.ajax({
             type: 'POST',
-            url: '/user/login',
+            url: '/ckan'+'/user/login',
             data: {name: signedinusername, email: profile.email, id_token: profile.uid, token: token},
             success: function(res, status, xhr) {
-              window.location.replace('/dataset');
+              window.location.replace('/ckan'+'/dataset');
             },
             error: function(xhr, status, err) {
                alert('Login failure: ' + err);
