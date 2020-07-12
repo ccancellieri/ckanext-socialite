@@ -111,6 +111,9 @@ class SocialitePlugin(plugins.SingletonPlugin):
         """Login the user with credentials from the SocialAuth used. The CKAN
         username is created and access given.
         """
+        # toolkit.request.environ
+        # https://github.com/eHealthAfrica/ckanext-oauth2/blob/master/ckanext/oauth2/oauth2.py
+
         params = toolkit.request.params
         if 'id_token' in params:
             user_account = params['email'].split('@')[0]

@@ -10,8 +10,9 @@
 {% block meta %}
 {% set ci=h.googleauth_get_clientid() %}
 {% set hd=h.googleauth_get_hosted_domain() %}
+
+
   {{ super() }}
-<div id="g-signin-button" data-width="300" data-height="200" data-longtitle="true">
 
     <meta name="google-signin-scope" content="profile email">
     <meta name="google-signin-client_id" content="{{ ci }}">
@@ -19,37 +20,183 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="https://www.gstatic.com/firebasejs/4.4.0/firebase.js"></script>
-    <script src="https://apis.google.com/js/platform.js"></script>
-    <script>
-    function onSuccess(googleUser) {
-      console.log('Logged in as: ' + googleUser.getBasicProfile().getName());
-    }
-    function onFailure(error) {
-      console.log(error);
-    }
-    function renderButton() {
-      gapi.signin2.render('g-signin-button', {
-        'scope': 'profile email',
-        'width': 240,
-        'height': 50,
-        'longtitle': true,
-        'theme': 'dark',
-        'onsuccess': onSuccess,
-        'onfailure': onFailure
+
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/7.16.0/firebase-app.js"></script>
+
+    <!-- https://firebase.google.com/docs/web/setup#available-libraries -->
+    <script src="https://www.gstatic.com/firebasejs/7.16.0/firebase-auth.js"></script>
+
+<script>
+  var firebaseConfig = {
+    apiKey: "AIzaSyDsclAFQQikHekpQJ7g6zFvR8C-XQw6-sA",
+    authDomain: "fao-maps-review.firebaseapp.com",
+    databaseURL: "https://fao-maps-review.firebaseio.com",
+    projectId: "fao-maps-review",
+    storageBucket: "fao-maps-review.appspot.com",
+    messagingSenderId: "1036455980974",
+    appId: "1:1036455980974:web:2ff90c50d68fbf64b7e23f"
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+
+  firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        console.log('User is signed IN');
+        var displayName = user.displayName;
+        var email = user.email;
+        var emailVerified = user.emailVerified;
+        var photoURL = user.photoURL;
+        var isAnonymous = user.isAnonymous;
+        var uid = user.uid;
+        var providerData = user.providerData;
+        // ...
+      } else {
+        console.log('User is signed OUT');
+
+      }
+  });
+</script>
+
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+<script>
+  // GOOGLE PROVIDER INIT
+
+  function initializeGoogleProvider() {
+    let provider = new firebase.auth.GoogleAuthProvider();
+
+    provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
+
+    // firebase.auth().languageCode = 'pt';
+    // To apply the default browser preference instead of explicitly setting it.
+    firebase.auth().useDeviceLanguage();
+
+    provider.setCustomParameters({
+      'login_hint': 'ckan'
+    });
+    return provider;
+  }
+
+  var gprovider = initializeGoogleProvider();
+
+  // END PROVIDERS
+</script>
+
+<script>
+  // INTEGRATION
+
+  function onSignIn(googleUser) {
+
+      console.log('Google Auth Response', googleUser);
+
+      var profile = googleUser.getBasicProfile();
+      console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+      console.log('Name: ' + profile.getName());
+      console.log('Image URL: ' + profile.getImageUrl());
+      console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+
+      // We need to register an Observer on Firebase Auth to make sure auth is initialized.
+      var unsubscribe = firebase.auth().onAuthStateChanged(function(firebaseUser) {
+        unsubscribe();
+        // Check if we are already signed-in Firebase with the correct user.
+        if (!isUserEqual(googleUser, firebaseUser)) {
+
+          // Build Firebase credential with the Google ID token.
+          var credential = firebase.auth.GoogleAuthProvider.credential(
+              googleUser.getAuthResponse().id_token);
+
+          // Sign in with credential from the Google user.
+          firebase.auth().signInWithCredential(credential).catch(function(error) {
+            // Handle Errors here.
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            // The email of the user's account used.
+            var email = error.email;
+            // The firebase.auth.AuthCredential type that was used.
+            var credential = error.credential;
+            // ...
+              console.log('ERROR'+error);
+          });
+        } else {
+          console.log('User already signed-in Firebase.');
+        }
       });
     }
-  </script>
 
-    <script type="text/javascript" src="/base/js/googleauth.js"></script>
-    <script type="text/javascript" src="/base/js/facebookauth.js"></script>
-    <script src="https://use.fontawesome.com/af91ed6914.js"></script>
-    <script type="text/javascript" src="/base/js/linkedinauth.js"></script>
-    <script type="text/javascript" src="//platform.linkedin.com/in.js">
-        api_key: 86xzgmhw4t24sw
-        authorize: false
-        onLoad: onLinkedInLoad
-    </script>
-    <script>startApp();</script>
+    function isUserEqual(googleUser, firebaseUser) {
+      if (firebaseUser) {
+        var providerData = firebaseUser.providerData;
+        for (var i = 0; i < providerData.length; i++) {
+          if (providerData[i].providerId === firebase.auth.GoogleAuthProvider.PROVIDER_ID &&
+              providerData[i].uid === googleUser.getBasicProfile().getId()) {
+            // We don't need to reauth the Firebase connection.
+            return true;
+          }
+        }
+      }
+      return false;
+    }
 
+  // END INTEGRATION
+</script>
+
+
+<script>
+
+
+  function popupLogin(provider) {
+
+        //firebase.auth().signInWithRedirect(provider);
+        firebase.auth().signInWithPopup(provider).then(function(result) {
+              // This gives you a Google Access Token. You can use it to access the Google API.
+              var token = result.credential.accessToken;
+              // The signed-in user info.
+              var user = result.user;
+              // ...
+              console.log('LOGGED IN:'+result);
+
+        }).catch(function(error) {
+              // Handle Errors here.
+              var errorCode = error.code;
+              var errorMessage = error.message;
+              // The email of the user's account used.
+              var email = error.email;
+              // The firebase.auth.AuthCredential type that was used.
+              var credential = error.credential;
+              // ...
+              console.log('ERROR'+error);
+        });
+  }
+
+  function login (email, password) {
+      firebase.auth().createUserWithEmailAndPassword(email, password).catch(
+          function(error) {
+              // Handle Errors here.
+              var errorCode = error.code;
+              var errorMessage = error.message;
+
+              console.log('ERROR'+error);
+          });
+  }
+
+  function signin (email, password) {
+      firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
+          // Handle Errors here.
+          var errorCode = error.code;
+          var errorMessage = error.message;
+
+          console.log('ERROR'+error);
+      });
+  }
+
+  function logout (){
+      firebase.auth().signOut().then(
+        function() {
+          console.log('Sign-out successful')
+        }).catch(function(error) {
+          console.log('An error happened.');
+        });
+  }
+</script>
 {% endblock %}

@@ -20,12 +20,13 @@
       <fieldset>
         <legend><h4>{{ _('Log in with Social Media') }}</h4></legend>
         <div class="login-box">
-          <a href="#" class="social-button" id="facebook-btn" onclick="fb_login();"> <span>Sign in with Facebook</span></a>
+          <!--a href="#" class="social-button" id="facebook-btn" onclick="fb_login();"> <span>Sign in with Facebook</span></a-->
           &nbsp;&nbsp;
-          <a class="google-btn social-button " id="g-signin-button"> <span>Sign in with Google</span></a>
-          <a class="github-btn social-button " id="github-button" onclick="login()"> <span>Sign in with Github</span></a>
+        <!--div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div-->
+          <a class="google-btn social-button " onclick="popupLogin(gprovider)" id="g-signin2"> <span>Sign in with Google</span></a>
+          <!--a class="github-btn social-button " id="github-button" onclick="login()"> <span>Sign in with Github</span></a>
           &nbsp;&nbsp;
-          <a class="social-button" id="linkedin-btn" onclick="liAuth()"> <span>Sign in with LinkedIn</span></a>
+          <a class="social-button" id="linkedin-btn" onclick="liAuth()"> <span>Sign in with LinkedIn</span></a-->
         </div>
       </fieldset>
       <br><br>  
