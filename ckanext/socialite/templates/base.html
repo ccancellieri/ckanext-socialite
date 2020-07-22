@@ -47,7 +47,7 @@
     <script asynch src="https://www.gstatic.com/firebasejs/7.16.0/firebase-auth.js"></script>
 
 <script>
-  var firebaseConfig = {
+  var firebaseConfig2 = {
     apiKey: "AIzaSyDsclAFQQikHekpQJ7g6zFvR8C-XQw6-sA",
     authDomain: "fao-maps-review.firebaseapp.com",
     databaseURL: "https://fao-maps-review.firebaseio.com",
@@ -56,30 +56,23 @@
     messagingSenderId: "1036455980974",
     appId: "1:1036455980974:web:2ff90c50d68fbf64b7e23f"
   };
-
+  var firebaseConfig = {
+    apiKey: "AIzaSyDsclAFQQikHekpQJ7g6zFvR8C-XQw6-sA",
+    authDomain: "fao-maps-review.firebaseapp.com",
+    databaseURL: "https://fao-maps-review.firebaseio.com",
+    projectId: "fao-maps-review",
+    storageBucket: "fao-maps-review.appspot.com",
+    messagingSenderId: "1036455980974",
+    appId: "1:1036455980974:web:42e8ecf65302462fb7e23f"
+  };
   // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
 
   firebase.auth().onAuthStateChanged(function(user) {
       if (user) {
         console.log('User is signed IN');
-        var displayName = user.displayName;
-        var email = user.email;
-        var emailVerified = user.emailVerified;
-        var photoURL = user.photoURL;
-        var isAnonymous = user.isAnonymous;
-        var uid = user.uid;
-        var providerData = user.providerData;
 
-        doLogin({
-            'displayName':displayName,
-            'email':email,
-            'emailVerified':emailVerified,
-            'photoURL':photoURL,
-            'isAnonymous':isAnonymous,
-            'uid':uid,
-            'providerData':providerData
-        });
+        doLogin(user.toJSON());
 
       } else {
         console.log('User is signed OUT');

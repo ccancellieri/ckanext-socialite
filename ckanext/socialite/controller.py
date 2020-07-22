@@ -13,8 +13,8 @@ from ckan.common import g, request, response, config, session
 import ckan.plugins.toolkit as toolkit
 import json
 import uuid
-
 log = logging.getLogger(__name__)
+from firebase_admin import auth
 
 
 class UserFirebaseController(user.UserController):
@@ -33,6 +33,9 @@ class UserFirebaseController(user.UserController):
         # https://github.com/eHealthAfrica/ckanext-oauth2/blob/master/ckanext/oauth2/oauth2.py
 
         params = json.loads(request.body) #toolkit.request.params
+       # decoded_token = auth.verify_id_token(id_token)
+       # uid = decoded_token['uid']
+
         if 'uid' in params:
             user_account = params['email'].split('@')[0]
             full_name = params['displayName']
